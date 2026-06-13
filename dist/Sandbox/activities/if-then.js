@@ -34,7 +34,6 @@ const IF_LEVELS = [
 
 let ifWorkspace = null;
 let compiledRules = {};
-let testedBulbs = new Set();
 
 function registerIfBlocks(colors, reactions) {
   Blockly.Blocks['if_light_rule'] = {
@@ -52,7 +51,7 @@ function registerIfBlocks(colors, reactions) {
 }
 
 function loadIfLevel(idx) {
-  currentLevel = idx;  // Consistent global for all activities
+  currentLevel = idx;
   const lvl = IF_LEVELS[idx];
 
   document.querySelectorAll('.levels .level-btn').forEach((b, i) =>
@@ -61,14 +60,9 @@ function loadIfLevel(idx) {
   hideFeedback();
 
   compiledRules = {};
-  testedBulbs = new Set();
   seResetReactionScreen();
   renderBulbs(lvl.bulbs, lvl.activeBulbs);
   registerIfBlocks(lvl.bulbs, lvl.reactions);
-
-  // ┌─ CRITICAL: Clear blocklyDiv before injecting new workspace ─┐
-  const blocklyDiv = document.getElementById('blocklyDiv');
-  if (blocklyDiv) blocklyDiv.innerHTML = '';
 
   if (ifWorkspace) { ifWorkspace.dispose(); ifWorkspace = null; }
 
@@ -109,12 +103,6 @@ function renderBulbs(bulbs, activeBulbs) {
 }
 
 function runIfCode() {
-  if (!ifWorkspace) {
-    showFeedback('error', 'No workspace loaded.');
-    return;
-  }
-
-  testedBulbs.clear();
   compiledRules = seCompileRules(ifWorkspace, 'if_light_rule');
   const count = Object.keys(compiledRules).length;
   const lvl = IF_LEVELS[currentLevel];
@@ -128,11 +116,15 @@ function runIfCode() {
     .querySelectorAll('.bulb:not(.locked)')
     .forEach(b => { b.classList.add('on'); setTimeout(() => b.classList.remove('on'), 300); });
 
-  const missing = lvl.activeBulbs.filter(c => !compiledRules[c]);
-  if (missing.length === 0) {
-    showFeedback('success', `✅ ${count} rule${count !== 1 ? 's' : ''} loaded! Now test each active light.`);
-  } else {
-    showFeedback('info', `✅ ${count} rule${count !== 1 ? 's' : ''} loaded. Test the lights, especially ${missing.join(', ')}.`);
+  showFeedback('success', `✅ ${count} rule${count !== 1 ? 's' : ''} loaded! Now click a light to test.`);
+
+  if (currentLevel < 3) {
+    const covered = lvl.activeBulbs.filter(c => compiledRules[c]);
+    if (covered.length === lvl.activeBulbs.length) {
+      completedLevels.add(currentLevel);
+      updateProgress();
+      setTimeout(() => showCelebration(currentLevel, lvl), 800);
+    }
   }
 }
 
@@ -147,17 +139,17 @@ function testLight(color) {
     return;
   }
 
-  testedBulbs.add(color);
   const r = SE_REACTIONS[reaction] || { emoji: '⚡', label: reaction, color: '#fff' };
   seShowReaction(r.emoji, r.label, `Rule fired: IF ${color.toUpperCase()} → ${reaction}`, r.color);
   hideFeedback();
 
-  const allHaveRules = lvl.activeBulbs.every(c => compiledRules[c]);
-  const allTested = lvl.activeBulbs.every(c => testedBulbs.has(c));
-  if (allHaveRules && allTested && !completedLevels.has(currentLevel)) {
-    completedLevels.add(currentLevel);
-    updateProgress();
-    setTimeout(() => showCelebration(currentLevel, lvl), 1000);
+  if (currentLevel === 3) {
+    const covered = IF_LEVELS[3].activeBulbs.filter(c => compiledRules[c]);
+    if (covered.length === IF_LEVELS[3].activeBulbs.length) {
+      completedLevels.add(3);
+      updateProgress();
+      setTimeout(() => showCelebration(3, IF_LEVELS[3]), 1000);
+    }
   }
 }
 

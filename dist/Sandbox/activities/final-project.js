@@ -95,10 +95,6 @@ function buildFPToolbox() {
 function setupFPWorkspace() {
   if (fpWorkspace) { fpWorkspace.dispose(); fpWorkspace = null; }
 
-  // ┌─ CRITICAL: Clear blocklyDiv before injecting new workspace ─┐
-  const blocklyDiv = document.getElementById('blocklyDiv');
-  if (blocklyDiv) blocklyDiv.innerHTML = '';
-
   fpWorkspace = Blockly.inject('blocklyDiv', {
     toolbox: buildFPToolbox(),
     scrollbars: true, trashcan: true,

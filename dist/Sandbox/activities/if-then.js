@@ -29,7 +29,6 @@ const IF_LEVELS = [
   }
 ];
 
-let currentLevel = 0;
 let ifCompleted = new Set();
 let ifWorkspace = null;
 
@@ -64,7 +63,3 @@ function clearIfCode() {
   // Stub - to be implemented
   console.log('If-Then: Clearing code');
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-  loadIfLevel(0);
-});

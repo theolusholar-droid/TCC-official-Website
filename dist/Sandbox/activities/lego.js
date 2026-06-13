@@ -37,7 +37,6 @@ const LEVELS = [
   }
 ];
 
-let currentLevel = 0;
 let stackCompleted = new Set();
 let workspace = null;
 
@@ -50,6 +49,11 @@ function loadLevel(idx) {
   });
 
   document.getElementById('goal-text').textContent = lvl.goal;
+  
+  // Update main mission label with level-specific info
+  const missionEl = document.querySelector('.mission');
+  if (missionEl) missionEl.textContent = `🧱 Stack Builder — ${lvl.title}`;
+  
   hideFeedback();
 
   registerBlocks(lvl.colors);
@@ -190,6 +194,8 @@ function nextLevel() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  // Pre-register all block definitions so they're available when needed
   LEVELS.forEach(lvl => registerBlocks(lvl.colors));
-  loadLevel(0);
+  // Do NOT call loadLevel() here — let the activity router (loop-builder.js) handle initialization
 });
+

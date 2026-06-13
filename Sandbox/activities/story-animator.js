@@ -25,6 +25,11 @@ function loadAnimLevel(idx) {
 
   document.querySelectorAll('.levels .level-btn').forEach((b, i) =>
     b.classList.toggle('active', i === idx));
+  
+  // Update main mission label with level-specific info
+  const missionEl = document.querySelector('.mission');
+  if (missionEl) missionEl.textContent = `🎬 Story Animator — Level ${idx + 1}`;
+  
   document.getElementById('goal-text').textContent = lvl.goal;
   hideFeedback();
 

@@ -79,7 +79,7 @@ function switchActivity(name) {
     if (panel) {
       panel.style.display = 'block';
     }
-  } else if (name === 'if') {
+  } else if (name === 'if' || name === 'ifthen') {
     document.querySelector('.mission').textContent = '🚦 If-Then Builder — Logic Rules';
     if (typeof loadIfLevel === 'function') loadIfLevel(0);
     const panel = document.getElementById('panel-ifthen');
@@ -230,6 +230,11 @@ function loadLoopLevel(idx) {
   currentLoopLevel = idx;  // Also keep for backward compatibility
   const lvl = LOOP_LEVELS[idx];
   document.querySelectorAll('.levels .level-btn').forEach((b,i)=> b.classList.toggle('active', i===idx));
+  
+  // Update main mission label with level-specific info
+  const missionEl = document.querySelector('.mission');
+  if (missionEl) missionEl.textContent = `🔁 Loop Builder — ${lvl.title}`;
+  
   document.getElementById('goal-text').textContent = lvl.goal + '\n\nFacilitator prompt: "Did your loop produce the same stack as placing each brick one by one? So why would a programmer choose the loop?"';
 
   // show target

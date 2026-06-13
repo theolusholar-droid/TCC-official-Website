@@ -100,6 +100,10 @@ function setupFPWorkspace() {
   try { if (typeof ifWorkspace !== 'undefined' && ifWorkspace) { ifWorkspace.dispose(); ifWorkspace = null; } } catch(e){}
   try { if (typeof animWorkspace !== 'undefined' && animWorkspace) { animWorkspace.dispose(); animWorkspace = null; } } catch(e){}
 
+  // Update main mission label
+  const missionEl = document.querySelector('.mission');
+  if (missionEl) missionEl.textContent = '🎆 Free Project — Build Anything!';
+
   // ┌─ CRITICAL: Clear blocklyDiv before injecting new workspace ─┐
   const blocklyDiv = document.getElementById('blocklyDiv');
   if (blocklyDiv) blocklyDiv.innerHTML = '';

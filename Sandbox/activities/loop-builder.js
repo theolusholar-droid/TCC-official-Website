@@ -32,14 +32,20 @@ let loopWorkspace = null;
 let currentLoopLevel = 0;
 let loopCompleted = new Set();
 let currentActivity = 'stack'; // default
+const ACTIVITY_ALIAS = { ifthen: 'if' };
+
+function normalizeActivity(name) {
+  return ACTIVITY_ALIAS[name] || name;
+}
 
 function switchActivity(name) {
+  name = normalizeActivity(name);
   currentActivity = name;
   currentLevel = 0; // Reset to first level when switching activities
   
   document.getElementById('activity-stack').classList.toggle('active', name === 'stack');
   document.getElementById('activity-loop').classList.toggle('active', name === 'loop');
-  document.getElementById('activity-if').classList.toggle('active', name === 'if');
+  document.getElementById('activity-if').classList.toggle('active', name === 'if' || name === 'ifthen');
   document.getElementById('activity-anim').classList.toggle('active', name === 'anim');
   document.getElementById('activity-fp').classList.toggle('active', name === 'fp');
 
@@ -79,7 +85,7 @@ function switchActivity(name) {
     if (panel) {
       panel.style.display = 'block';
     }
-  } else if (name === 'if') {
+  } else if (name === 'if' || name === 'ifthen') {
     document.querySelector('.mission').textContent = '🚦 If-Then Builder — Logic Rules';
     if (typeof loadIfLevel === 'function') loadIfLevel(0);
     const panel = document.getElementById('panel-ifthen');
@@ -112,7 +118,7 @@ function runActivity() {
     if (typeof runCode === 'function') runCode();
   } else if (currentActivity === 'loop') {
     loopRun();
-  } else if (currentActivity === 'if') {
+  } else if (currentActivity === 'if' || currentActivity === 'ifthen') {
     if (typeof runIfCode === 'function') runIfCode();
   } else if (currentActivity === 'anim') {
     if (typeof runAnimCode === 'function') runAnimCode();
@@ -125,7 +131,7 @@ function clearActivity() {
     if (typeof clearStack === 'function') clearStack();
   } else if (currentActivity === 'loop') {
     loopClear();
-  } else if (currentActivity === 'if') {
+  } else if (currentActivity === 'if' || currentActivity === 'ifthen') {
     if (typeof clearIfCode === 'function') clearIfCode();
   } else if (currentActivity === 'anim') {
     if (typeof clearAnimCode === 'function') clearAnimCode();
@@ -230,6 +236,11 @@ function loadLoopLevel(idx) {
   currentLoopLevel = idx;  // Also keep for backward compatibility
   const lvl = LOOP_LEVELS[idx];
   document.querySelectorAll('.levels .level-btn').forEach((b,i)=> b.classList.toggle('active', i===idx));
+  
+  // Update main mission label with level-specific info
+  const missionEl = document.querySelector('.mission');
+  if (missionEl) missionEl.textContent = `🔁 Loop Builder — ${lvl.title}`;
+  
   document.getElementById('goal-text').textContent = lvl.goal + '\n\nFacilitator prompt: "Did your loop produce the same stack as placing each brick one by one? So why would a programmer choose the loop?"';
 
   // show target
@@ -381,7 +392,7 @@ function loadActivityLevel(idx) {
     if (typeof loadLevel === 'function') loadLevel(idx);
   } else if (currentActivity === 'loop') {
     if (typeof loadLoopLevel === 'function') loadLoopLevel(idx);
-  } else if (currentActivity === 'if') {
+  } else if (currentActivity === 'if' || currentActivity === 'ifthen') {
     if (typeof loadIfLevel === 'function') loadIfLevel(idx);
   } else if (currentActivity === 'anim') {
     if (typeof loadAnimLevel === 'function') loadAnimLevel(idx);
